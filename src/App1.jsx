@@ -28,7 +28,7 @@ export default function App1() {
   const [pdfUrl, setPdfUrl] = useState("");
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.0);
+  const [scale, setScale] = useState(1.02);
   const [rotation, setRotation] = useState(0);
   const [fileName, setFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +61,7 @@ export default function App1() {
       }
     },
     onDropRejected: (files) => {
-      setError("Only PDF files are allowed");
+      setError(`Only PDF files are allowed`);
     },
     onDropAccepted: () => {
       setSuccess("PDF uploaded");
@@ -191,8 +191,8 @@ export default function App1() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="flex flex-col min-h-screen bg-gray-50 p-4 gap-4">
+      <div className="bg-white rounded-xl p-6 shadow-md">
         <Toaster position="top-center" reverseOrder={false} />
 
         <ErrorAlert error={error} onClose={() => setError(null)} />
@@ -242,9 +242,9 @@ export default function App1() {
 
         {/* PDF Viewer and Tools */}
         {pdfFile && (
-          <div className="mt-6">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* PDF Viewer */}
+          <div className="flex flex-col gap-4">
+            {/* PDF Viewer */}
+            <div className="flex-1 bg-white rounded-xl shadow-md p-6">
               <PdfViewer
                 pdfFile={pdfFile}
                 pageNumber={pageNumber}
@@ -340,36 +340,50 @@ export default function App1() {
                     </AnnotationWrapper>
                   ))}
               </PdfViewer>
+            </div>
 
-              {/* Tools Panel */}
-              <div className="w-full lg:w-80 bg-gray-50 p-4 rounded-md">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                  Tools
-                </h2>
+            {/* Tools Panel - Now at the bottom with reorganized layout */}
+            <div className="bg-white rounded-xl shadow-md p-6 max-w-4xl mx-auto">
+              {/* Two-column layout for signature pad and annotations */}
+              <div className="flex flex-col md:flex-row gap-6 mb-6">
+                {/* Left column - Signature pad */}
+                <div className="flex-1 max-w-md">
+                  <SignatureTool
+                    onAddSignature={(signatureData) =>
+                      addSignature(signatureData, pageNumber)
+                    }
+                  />
+                </div>
 
-                <SignatureTool
-                  onAddSignature={(signatureData) =>
-                    addSignature(signatureData, pageNumber)
-                  }
-                />
+                {/* Right column - Stamps and Text annotations */}
+                <div className="flex-1 space-y-4">
+                  <StampTool
+                    onAddStamp={(text, color) =>
+                      addStamp(text, color, pageNumber)
+                    }
+                  />
+                  <TextTool
+                    onAddText={(text) => addTextAnnotation(text, pageNumber)}
+                  />
+                </div>
+              </div>
 
-                <StampTool
-                  onAddStamp={(text, color) =>
-                    addStamp(text, color, pageNumber)
-                  }
-                />
-
-                <TextTool
-                  onAddText={(text) => addTextAnnotation(text, pageNumber)}
-                />
-
-                <ActionsTool
-                  onGeneratePdf={handleGeneratePdf}
-                  onExportJson={handleExportJson}
-                  onSaveToServer={handleSaveToServer}
-                  onClearAll={clearAll}
-                  isLoading={isLoading}
-                />
+              {/* Action buttons in grid at the bottom */}
+              <div className="flex justify-center">
+                <div className="max-w-2xl w-full">
+                  <ActionsTool
+                    onGeneratePdf={handleGeneratePdf}
+                    onExportJson={handleExportJson}
+                    onSaveToServer={handleSaveToServer}
+                    onClearAll={clearAll}
+                    isLoading={isLoading}
+                    layout="flex"
+                    isExportJsonDisabled={false}
+                    isSaveDisabled={false}
+                    isClearDisabled={false}
+                    isGeneratePdfDisabled={true}
+                  />
+                </div>
               </div>
             </div>
           </div>

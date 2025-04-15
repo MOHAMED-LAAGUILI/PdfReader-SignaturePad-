@@ -1,4 +1,4 @@
-import { Rotate3d, X } from 'lucide-react';
+import { Rotate3d, Trash2, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import { Resizable } from 'react-resizable';
@@ -23,57 +23,90 @@ export default function AnnotationWrapper({
   const [active, setActive] = useState(defaultActive);
   const [isResizing, setIsResizing] = useState(false);
   const [rotationState, setRotation] = useState(rotation);
+  const [position, setPosition] = useState({ x, y });
+  const [size, setSize] = useState({ width, height });
   const nodeRef = useRef(null);
 
   useEffect(() => {
     setRotation(rotation);
   }, [rotation]);
 
+  useEffect(() => {
+    setPosition({ x, y });
+  }, [x, y]);
+
+  useEffect(() => {
+    setSize({ width, height });
+  }, [width, height]);
+
   const handleDrag = (e, data) => {
-    onDrag(id, data.x, data.y);
+    if (!isResizing) {
+      const newPos = { x: data.x, y: data.y };
+      setPosition(newPos);
+      onDrag(id, data.x, data.y);
+    }
   };
 
-  const handleResize = (e, { size }) => {
-    onResize(id, size.width, size.height);
+  const handleResizeStart = () => {
+    setIsResizing(true);
+    setActive(true);
+  };
+
+  const handleResize = (e, { size: newSize }) => {
+    setSize(newSize);
+    onResize(id, newSize.width, newSize.height);
+  };
+
+  const handleResizeStop = () => {
+    setIsResizing(false);
   };
 
   return (
     <Draggable
       nodeRef={nodeRef}
-      position={{ x, y }}
+      position={position}
       bounds="parent"
-      onStart={() => setActive(true)}
+      onStart={() => {
+        if (!isResizing) {
+          setActive(true);
+          return true;
+        }
+        return false;
+      }}
+      onDrag={handleDrag}
       onStop={handleDrag}
-      disabled={isResizing}
+      cancel=".react-resizable-handle"
     >
       <div
         ref={nodeRef}
-        className={`absolute z-20 group transition-all duration-200 ${active ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:ring-2 hover:ring-blue-300 hover:shadow-md'}`}
+        className={`absolute z-20 group ${active ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:ring-2 hover:ring-blue-300 hover:shadow-md'}`}
         style={{
           outline: active ? '2px dashed #3182ce' : 'none',
           borderRadius: '8px',
+          cursor: isResizing ? 'se-resize' : 'move',
         }}
         onMouseEnter={() => setActive(true)}
-        onMouseLeave={() => setActive(false)}
+        onMouseLeave={() => !isResizing && setActive(false)}
       >
         <Resizable
-          width={width}
-          height={height}
+          width={size.width}
+          height={size.height}
           minConstraints={[minWidth, minHeight]}
-          onResizeStart={() => setIsResizing(true)}
-          onResizeStop={(e, data) => { setIsResizing(false); handleResize(e, data); }}
+          onResizeStart={handleResizeStart}
+          onResize={handleResize}
+          onResizeStop={handleResizeStop}
+          draggableOpts={{ grid: [1, 1] }}
         >
           <div
             style={{
-              width: width + 'px',
-              height: height + 'px',
-              border: '2px solid red', 
-              background: 'rgba(255,255,255,0.7)',
+              width: size.width + 'px',
+              height: size.height + 'px',
+              border: active ? '2px solid #3182ce' : '2px solid #e2e8f0',
+              background: 'rgba(255,255,255,0.9)',
               position: 'relative',
               boxSizing: 'border-box',
               overflow: 'visible',
               borderRadius: '8px',
-              transition: 'background 0.2s',
             }}
           >
             <div
@@ -88,35 +121,46 @@ export default function AnnotationWrapper({
             >
               {children}
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setRotation((r) => (r + 15) % 360);
-                if (onRotate) onRotate(id, (rotationState + 15) % 360);
+            {active && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRotation((r) => (r + 15) % 360);
+                    if (onRotate) onRotate(id, (rotationState + 15) % 360);
+                  }}
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-yellow-500 z-50 shadow"
+                  title="Rotate annotation"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer', top: '-28px' }}
+                >
+                  <Rotate3d size={14} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(id);
+                  }}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 z-50 shadow"
+                  title="Delete annotation"
+                  tabIndex={0}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </>
+            )}
+            <div 
+              className="react-resizable-handle react-resizable-handle-se absolute w-4 h-4 bg-blue-500 rounded-full cursor-se-resize"
+              style={{ 
+                bottom: -6, 
+                right: -6, 
+                zIndex: 40,
+                border: '2px solid white'
               }}
-              className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-yellow-500 z-50 shadow tooltip"
-              title="Rotate annotation"
-              tabIndex={0}
-              style={{ cursor: 'pointer', top: '-28px', zIndex: 50 }}
-            >
-             <Rotate3d/>
-             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(id);
-              }}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 z-50 shadow tooltip"
-              title="Delete annotation"
-              tabIndex={0}
-              style={{ zIndex: 50 }}
-            >
-             <X/>
-            </button>
+            />
           </div>
         </Resizable>
       </div>
     </Draggable>
   );
 };
-
