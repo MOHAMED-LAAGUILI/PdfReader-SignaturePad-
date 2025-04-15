@@ -1,59 +1,29 @@
+const stampOptions = [
+  { label: 'APPROVED', src: 'https://tse3.mm.bing.net/th?id=OIP.YzgyhBauwDFBhCsQWIdM5gHaGp&pid=Api&P=0&h=180' },
+  { label: 'REJECTED', src: 'http://pluspng.com/img-png/rejected-stamp-png-1024.jpg' },
+  { label: 'VERIFIED', src: 'https://img.freepik.com/premium-vector/verified-stamp-vector-seal-design_116137-6262.jpg?w=2000' },
+];
+
 const StampTool = ({ onAddStamp }) => {
-    const stampOptions = [
-      { text: 'APPROVED', color: '#00aa00' },
-      { text: 'REJECTED', color: '#ff0000' },
-      { text: 'CONFIDENTIAL', color: '#0000ff' },
-      { text: 'DRAFT', color: '#888888' },
-      { text: 'URGENT', color: '#ff9900' },
-      { text: 'VERIFIED', color: '#009900' },
-    ];
-  
-    return (
-      <div className="mb-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Stamp</h3>
-        <div className="grid grid-cols-2 gap-2 mb-2">
-          {stampOptions.map((stamp) => (
-            <button
-              key={stamp.text}
-              onClick={() => onAddStamp(stamp.text, stamp.color)}
-              className="px-3 py-2 rounded-md border"
-              style={{
-                backgroundColor: `${stamp.color}20`,
-                color: stamp.color,
-                borderColor: stamp.color
-              }}
-            >
-              {stamp.text}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Custom stamp text"
-            className="flex-1 px-3 py-1 border border-gray-300 rounded-md"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.target.value) {
-                onAddStamp(e.target.value, '#000000');
-                e.target.value = '';
-              }
-            }}
-          />
+  return (
+    <div className="mb-6">
+      <h3 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">Stamps</h3>
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        {stampOptions.map((stamp) => (
           <button
-            onClick={(e) => {
-              const input = e.target.previousElementSibling;
-              if (input.value) {
-                onAddStamp(input.value, '#000000');
-                input.value = '';
-              }
-            }}
-            className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            key={stamp.label}
+            onClick={() => onAddStamp(stamp.src)}
+            className="border-2 border-gray-200 rounded-xl p-2 bg-white hover:bg-blue-50 focus:ring-2 focus:ring-blue-400 transition flex flex-col items-center shadow-sm group"
+            title={stamp.label}
+            tabIndex={0}
           >
-            Add
+            <img src={stamp.src} alt={stamp.label} className="h-12 w-auto mx-auto rounded mb-1 group-hover:scale-110 transition-transform duration-150" />
+            <span className="text-xs text-gray-600 mt-1 group-hover:text-blue-700">{stamp.label}</span>
           </button>
-        </div>
+        ))}
       </div>
-    );
-  };
-  
-  export default StampTool;
+    </div>
+  );
+};
+
+export default StampTool;

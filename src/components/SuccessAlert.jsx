@@ -1,22 +1,22 @@
 import { useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
-const ErrorAlert = ({ error, onClose }) => {
-  const lastErrorRef = useRef(null);
+const SuccessAlert = ({ success, onClose }) => {
+  const lastSuccessRef = useRef(null);
 
   useEffect(() => {
-    if (error && error !== lastErrorRef.current) {
-      toast.error(error);
-      lastErrorRef.current = error;
+    if (success && success !== lastSuccessRef.current) {
+      toast.success(success);
+      lastSuccessRef.current = success;
 
       if (typeof onClose === 'function') {
         const timeout = setTimeout(onClose, 5000); // auto-dismiss logic
         return () => clearTimeout(timeout);
       }
     }
-  }, [error, onClose]);
+  }, [success, onClose]);
 
   return null;
 };
 
-export default ErrorAlert;
+export default SuccessAlert;

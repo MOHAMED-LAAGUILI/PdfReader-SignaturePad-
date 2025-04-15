@@ -11,10 +11,11 @@ const usePdfAnnotations = () => {
       type: 'signature',
       data: signatureData,
       page: pageNumber,
-      x: 100,
-      y: 100,
+      x: 80,
+      y: -100,
       width: 200,
       height: 100,
+      rotation: 0,
       createdAt: new Date().toISOString()
     };
     setSignatures([...signatures, newSignature]);
@@ -27,12 +28,13 @@ const usePdfAnnotations = () => {
       type: 'stamp',
       text,
       page: pageNumber,
-      x: 100,
-      y: 100,
+      x: 80,
+      y: -100,
       color,
       fontSize: 24,
       width: 150,
       height: 50,
+      rotation: 0,
       createdAt: new Date().toISOString()
     };
     setStamps([...stamps, newStamp]);
@@ -45,19 +47,20 @@ const usePdfAnnotations = () => {
       type: 'text',
       content,
       page: pageNumber,
-      x: 100,
-      y: 100,
+      x: 40,
+      y: -80,
       color: '#000000',
       fontSize: 14,
       width: 200,
       height: 50,
+      rotation: 0,
       createdAt: new Date().toISOString()
     };
     setTextAnnotations([...textAnnotations, newAnnotation]);
     return newAnnotation;
   };
-// In your usePdfAnnotations hook or directly in App.jsx
-const updateAnnotationPosition = (id, x, y) => {
+
+  const updateAnnotationPosition = (id, x, y) => {
     setSignatures(prev => prev.map(sig => 
       sig.id === id ? { ...sig, x, y } : sig
     ));
@@ -68,17 +71,28 @@ const updateAnnotationPosition = (id, x, y) => {
       annotation.id === id ? { ...annotation, x, y } : annotation
     ));
   };
-  
+
   const updateAnnotationSize = (id, width, height) => {
     setSignatures(prev => prev.map(sig => 
       sig.id === id ? { ...sig, width, height } : sig
     ));
-    // For stamps and text annotations if you want them resizable
     setStamps(prev => prev.map(stamp => 
       stamp.id === id ? { ...stamp, width, height } : stamp
     ));
     setTextAnnotations(prev => prev.map(annotation => 
       annotation.id === id ? { ...annotation, width, height } : annotation
+    ));
+  };
+
+  const updateAnnotationRotation = (id, rotation) => {
+    setSignatures(prev => prev.map(sig => 
+      sig.id === id ? { ...sig, rotation } : sig
+    ));
+    setStamps(prev => prev.map(stamp => 
+      stamp.id === id ? { ...stamp, rotation } : stamp
+    ));
+    setTextAnnotations(prev => prev.map(annotation => 
+      annotation.id === id ? { ...annotation, rotation } : annotation
     ));
   };
 
@@ -103,6 +117,7 @@ const updateAnnotationPosition = (id, x, y) => {
     addTextAnnotation,
     updateAnnotationPosition,
     updateAnnotationSize,
+    updateAnnotationRotation,
     deleteAnnotation,
     clearAll
   };

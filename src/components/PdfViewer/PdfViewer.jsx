@@ -1,21 +1,18 @@
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import PdfControls from './PdfControls';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
-const PdfViewer = ({ 
-  pdfFile, 
-  pageNumber, 
-  numPages, 
-  scale, 
+const PdfViewer = ({
+  pdfFile,
+  pageNumber,
+  numPages,
+  scale,
   rotation,
   onDocumentLoadSuccess,
   onPageChange,
   onScaleChange,
   onRotationChange,
-  children
+  children,
 }) => {
-
   return (
     <div className="flex-1">
       <PdfControls
@@ -27,25 +24,33 @@ const PdfViewer = ({
         onScaleChange={onScaleChange}
         onRotationChange={onRotationChange}
       />
-      
-      <div 
-        className="border border-gray-300 rounded-md overflow-auto relative"
-        style={{ minHeight: '600px' }}
+
+      <div
+        className="pdf-viewer-container border border-gray-300 rounded-xl relative bg-gradient-to-b from-gray-50 to-gray-100 shadow-xl transition-all duration-200 flex justify-center items-center w-full max-w-full overflow-x-auto"
+        style={{ minHeight: '980px', boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.12)' }}
       >
-        <Document
-          file={pdfFile}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={<div className="p-4 text-gray-600">Loading PDF...</div>}
-        >
-          <Page
-            pageNumber={pageNumber}
-            scale={scale}
-            rotate={rotation}
-            renderAnnotationLayer={false}
-            renderTextLayer={false}
-          />
-        </Document>
-        {children}
+        <div className="relative flex justify-center items-center w-full" style={{ maxWidth: 900, width: '100%' }}>
+          <Document
+            file={pdfFile}
+            onLoadSuccess={onDocumentLoadSuccess}
+            loading={
+              <div className="flex items-center justify-center h-full w-full min-h-[980px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
+              </div>
+            }
+          >
+            <Page
+              pageNumber={pageNumber}
+              scale={scale}
+              rotate={rotation}
+              renderAnnotationLayer={false}
+              renderTextLayer={false}
+              className="rounded-lg shadow-md mx-auto transition-all duration-200"
+              width={900}
+            />
+          </Document>
+          {children}
+        </div>
       </div>
     </div>
   );

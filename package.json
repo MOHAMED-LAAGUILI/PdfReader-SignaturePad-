@@ -19,6 +19,7 @@
     "react-dom": "^19.0.0",
     "react-draggable": "^4.4.6",
     "react-dropzone": "^14.3.8",
+    "react-hot-toast": "^2.5.2",
     "react-pdf": "^7.7.3",
     "react-resizable": "^3.0.5",
     "react-rnd": "^10.5.2",

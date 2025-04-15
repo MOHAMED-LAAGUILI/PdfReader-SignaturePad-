@@ -9,7 +9,7 @@ import axios from 'axios';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 
-const App = () => {
+export default function App0() {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState('');
   const [numPages, setNumPages] = useState(null);
@@ -549,4 +549,3 @@ const App = () => {
   );
 };
 
-export default App;
